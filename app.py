@@ -9,7 +9,14 @@ import glob
 from pathlib import Path
 from PIL import Image, ImageOps
 import streamlit as st
+import boto3
+import uuid
+from secretsss import access_key, secret_access_key
 
+client = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=secret_access_key)
+upload_bucket = 'test-ml-facedistance'
+
+uniqueId = uuid.uuid1()
 
 # st.set_option('depracation.showfileUploaderEncoding', False)
 
@@ -74,8 +81,14 @@ else:
 
     if st.button("Process"):
         jpgCounter = len(glob.glob1('./runs', "*.jpg"))
-        path = os.getcwd()+'/runs'
+        path = os.getcwd() + '/runs'
         result_img, distances = import_and_predict('input.jpg')
-        cv2.imwrite(os.path.join(path, str(jpgCounter+1)+'.jpg'), cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB))
+        cv2.imwrite(os.path.join(path, str(uniqueId) + '.jpg'), cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB))
         st.image(result_img, use_column_width=True)
+
+        # S3 config
+        upload_key = str(uniqueId) + '.jpg'
+        img = Image.fromarray(result_img, 'RGB')
+        client.upload_file(os.getcwd() + '\\runs\\' + str(uniqueId) + '.jpg', upload_bucket, upload_key)
+
         st.success("The distance is: " + " ".join(str(x) for x in distances) + " inches")
