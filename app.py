@@ -1,4 +1,5 @@
 # import the necessary packages
+import requests
 from imutils import face_utils
 import numpy as np
 import os
@@ -9,15 +10,21 @@ import glob
 from pathlib import Path
 from PIL import Image, ImageOps
 import streamlit as st
+
+# s3 SETUP
 import boto3
 import uuid
 from secretsss import access_key, secret_access_key
 
 client = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=secret_access_key)
 upload_bucket = 'test-ml-facedistance'
-
 uniqueId = uuid.uuid1()
 
+# TODO: Device_Detector SETUP
+# from device_detector import DeviceDetector
+#
+# device = DeviceDetector('user_agent').parse()
+#
 # st.set_option('depracation.showfileUploaderEncoding', False)
 
 
@@ -65,10 +72,10 @@ def import_and_predict(image_data):
     return image, distances
 
 
+# main
 model = load_model()
 
 st.title("Distance Calculation :camera_with_flash::wink:")
-
 file = st.file_uploader("Upload here", type=["jpg", "png", "jpeg"])
 
 if file is None:
@@ -78,6 +85,11 @@ else:
     st.image(image, caption='Selfie', use_column_width=True)
     img_array = np.array(image)
     cv2.imwrite('input.jpg', cv2.cvtColor(img_array, cv2.COLOR_RGB2RGBA))
+    img = cv2.imread('input.jpg', 0)
+    height, width = img.shape[:2]
+    if height < width:
+        img_rotate_90_clockwise = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+        cv2.imwrite('input.jpg', img_rotate_90_clockwise)
 
     if st.button("Process"):
         jpgCounter = len(glob.glob1('./runs', "*.jpg"))
@@ -89,6 +101,6 @@ else:
         # S3 config
         upload_key = str(uniqueId) + '.jpg'
         img = Image.fromarray(result_img, 'RGB')
-        client.upload_file(os.getcwd() + '\\runs\\' + str(uniqueId) + '.jpg', upload_bucket, upload_key)
+        # client.upload_file(os.getcwd() + '\\runs\\' + str(uniqueId) + '.jpg', upload_bucket, upload_key)
 
         st.success("The distance is: " + " ".join(str(x) for x in distances) + " inches")
