@@ -1,5 +1,4 @@
 # import the necessary packages
-import requests
 from imutils import face_utils
 import numpy as np
 import os
@@ -7,14 +6,13 @@ import imutils
 import dlib
 import cv2
 import glob
-from pathlib import Path
-from PIL import Image, ImageOps
+from PIL import Image
 import streamlit as st
 
 # s3 SETUP
 import boto3
 import uuid
-from secretsss import access_key, secret_access_key
+from images.secretsss import access_key, secret_access_key
 
 client = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=secret_access_key)
 upload_bucket = 'test-ml-facedistance'
