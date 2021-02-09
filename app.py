@@ -19,6 +19,7 @@ client = boto3.client('s3', aws_access_key_id=access_key, aws_secret_access_key=
 upload_bucket = 'test-ml-facedistance'
 uniqueId = uuid.uuid1()
 
+
 # TODO: Device_Detector SETUP
 # from device_detector import DeviceDetector
 #
@@ -81,7 +82,6 @@ st.subheader('Enter Actual Distance in Inches. ')
 actualDistance = st.slider('Slide me', min_value=0.0, max_value=100.0, step=0.01, key='Inches')
 file = st.file_uploader("Upload here", type=["jpg", "png", "jpeg"])
 
-
 if file is None:
     st.write("### Please upload your selfie w/o zoom")
 else:
@@ -94,6 +94,24 @@ else:
     if height < width:
         img_rotate_90_clockwise = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
         cv2.imwrite('input.jpg', img_rotate_90_clockwise)
+        result_img, distances = import_and_predict('input.jpg')
+        print(len(distances))
+        if len(distances) == 0:
+            img_rotate_91_clockwise = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+            cv2.imwrite('input.jpg', img_rotate_91_clockwise)
+            img = cv2.imread('input.jpg', 0)
+            height, width = img.shape[:2]
+            print(height, width)
+            img_rotate_92_clockwise = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+            cv2.imwrite('input.jpg', img_rotate_92_clockwise)
+
+            # image_rot = image.rotate(90)
+            # image_rot.save('input.jpg')
+            img = cv2.imread('input.jpg', 0)
+            height, width = img.shape[:2]
+            print(height, width)
+            img_rotate_93_clockwise = cv2.rotate(img, cv2.ROTATE_90_CLOCKWISE)
+            cv2.imwrite('input.jpg', img_rotate_93_clockwise)
 
     if st.button("Process"):
         jpgCounter = len(glob.glob1('./runs', "*.jpg"))
