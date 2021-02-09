@@ -8,6 +8,7 @@ import cv2
 import glob
 from PIL import Image
 import streamlit as st
+import json
 
 # s3 SETUP
 import boto3
@@ -74,10 +75,15 @@ def import_and_predict(image_data):
 model = load_model()
 
 st.title("Distance Calculation :camera_with_flash::wink:")
+st.subheader('Enter your Device name. ')
+device = st.text_input('eg. Apple Iphone 12 max, Samsung s20 Ultra, etc')
+st.subheader('Enter Actual Distance in Inches. ')
+actualDistance = st.slider('Slide me', min_value=0.0, max_value=100.0, step=0.01, key='Inches')
 file = st.file_uploader("Upload here", type=["jpg", "png", "jpeg"])
 
+
 if file is None:
-    st.write("## Please upload your selfie w/o zoom")
+    st.write("### Please upload your selfie w/o zoom")
 else:
     image = Image.open(file)
     st.image(image, caption='Selfie', use_column_width=True)
@@ -93,6 +99,9 @@ else:
         jpgCounter = len(glob.glob1('./runs', "*.jpg"))
         path = os.getcwd() + '/runs'
         result_img, distances = import_and_predict('input.jpg')
+        userInput = {'DeviceName': device, 'ActualDistance': actualDistance, 'Calculated': distances}
+        with open(str(uniqueId) + ".json", "w") as outfile:
+            json.dump(userInput, outfile)
         cv2.imwrite(os.path.join(path, str(uniqueId) + '.jpg'), cv2.cvtColor(result_img, cv2.COLOR_BGR2RGB))
         st.image(result_img, use_column_width=True)
 
