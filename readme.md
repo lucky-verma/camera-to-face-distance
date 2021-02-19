@@ -12,8 +12,8 @@
 1. Focal length calculation requires object **bbox** and **Distance** to *calibrate* and *compute* the Focal length.
 2. We can use research surveys to get estimated head/{or any} sizes according to age & gender
    (https://pubmed.ncbi.nlm.nih.gov/18727867/), OR we can use the NN to get width estimation inplace.
-3. what we are doing is **not true** camera calibration. True camera calibration involves the intrinsic parameters of the camera. 
-   (http://www.vision.caltech.edu/bouguetj/calib_doc/htmls/parameters.html).
+3. what we are doing is **not true** camera calibration. True camera calibration involves the intrinsic parameters of the camera
+   (http://www.vision.caltech.edu/bouguetj/calib_doc/).
 
 ## Approach 2: UPDATED 
 1. get the width approximation based on survey data and user details from backend DB.
