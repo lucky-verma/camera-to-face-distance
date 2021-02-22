@@ -20,11 +20,14 @@ def getmp(image):
     edged = cv2.dilate(edged, None, iterations=40)
     ff = np.where(edged > 50)
     a1 = np.mean(ff[1])
+    print(ff, a1)
+    cv2.imshow('awdawd', edged)
+    cv2.waitKey(0)
     return a1
 
 
-lo = cv2.imread('a30.jpg')
-ro = cv2.imread('b30.jpg')
+lo = cv2.imread('t1.jpg')
+ro = cv2.imread('t2.jpg')
 lp = getmp(lo)
 lr = getmp(ro)
 p = abs(lp - lr)
