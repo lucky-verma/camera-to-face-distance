@@ -1,3 +1,9 @@
+# Quick Run
+
+1. `pip install -r req.txt`
+2. `streamlit run app.py`
+
+
 ### Getting data ready
 1. Can use `labelImg` or `roboflow.ai` for annotating.
 2. get atleast 100 datapoints with 7:2:1 train:valid:test ratio.
