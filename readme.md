@@ -1,3 +1,6 @@
+# Streamlit app
+![result](https://github.com/lucky-verma/camera-to-face-distance/blob/master/Streamlit%20App/runs/51f33da2-6780-11eb-b94e-001a7dda7115.jpg?raw=true)
+
 
 ## Approach 1: Triangle Similarity
    The triangle similarity goes something like this: Let’s say we have a marker or object with a known width W. We then place this marker some distance D from our camera. We take a picture of our object using our camera and then measure the apparent width in pixels P. This allows us to derive the perceived focal length F of our camera:
