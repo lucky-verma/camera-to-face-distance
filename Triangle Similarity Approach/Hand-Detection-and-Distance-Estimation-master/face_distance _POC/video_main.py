@@ -1,22 +1,33 @@
-import cv2
-import datetime
+# import the necessary packages
 import argparse
-import imutils
+import datetime
+from imutils import face_utils
+import cv2
 from imutils.video import VideoStream
 
+import dlib
 from utils import detector_utils as detector_utils
 
+
+# compute and return the distance from the hand to the camera using triangle similarity
+def distance_to_camera(knownWidth, focalLength, pixelWidth):
+    return (knownWidth * focalLength) / pixelWidth
+
+
+# construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
 ap.add_argument('-d', '--display', dest='display', type=int,
-                        default=1, help='Display the detected images using OpenCV. This reduces FPS')
+                default=1, help='Display the detected images using OpenCV. This reduces FPS')
 args = vars(ap.parse_args())
 
-detection_graph, sess = detector_utils.load_inference_graph()
+# initialize dlib's face detector (HOG-based) and then create
+# the facial landmark predictor
+detector = dlib.get_frontal_face_detector()
+predictor = dlib.shape_predictor("protos/shape_predictor_68_face_landmarks.dat")
+
+# detection_graph, sess = detector_utils.load_inference_graph()
 
 if __name__ == '__main__':
-    # Detection confidence threshold to draw bounding box
-    score_thresh = 0.60
-
     # Get stream from webcam and set parameters)
     vs = VideoStream().start()
 
@@ -35,6 +46,34 @@ if __name__ == '__main__':
             frame = vs.read()
             frame = cv2.resize(frame, (1280, 720))
 
+            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+            rects = detector(gray, 1)
+
+            for (i, rect) in enumerate(rects):
+                shape = predictor(gray, rect)
+                shape = face_utils.shape_to_np(shape)
+                (x, y, w, h) = face_utils.rect_to_bb(rect)
+                # Determined using a face of known width, code can be found in distance to camera
+                focalLength = 472  # my camera Focal length
+                # The average width of a human face (inches)
+                avg_width = 6.8
+                # To more easily differentiate distances and detected bboxes
+                color = None
+                color0 = (255, 0, 0)
+                color1 = (0, 50, 255)
+
+                dist = distance_to_camera(avg_width, focalLength, int(int(w + x) - int(x)))
+                distance = str(round(dist, 2))
+
+                print(w, avg_width, focalLength, int(x), int(y), distance)
+
+                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 255), 2)
+                cv2.putText(frame, "distance:" + distance + ' inches', (x - 10, y - 10),
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 255), 2)
+
+                # for (x, y) in shape:
+                #     cv2.circle(frame, (x, y), 1, (255, 255, 0), -1)
+
             if im_height == None:
                 im_height, im_width = frame.shape[:2]
 
@@ -43,14 +82,6 @@ if __name__ == '__main__':
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             except:
                 print("Error converting to RGB")
-
-            # Run image through tensorflow graph
-            boxes, scores, classes = detector_utils.detect_objects(
-                frame, detection_graph, sess)
-
-            # Draw bounding boxeses and text
-            detector_utils.draw_box_on_image(
-                num_hands_detect, score_thresh, scores, boxes, classes, im_width, im_height, frame)
 
             # Calculate Frames per second (FPS)
             num_frames += 1
